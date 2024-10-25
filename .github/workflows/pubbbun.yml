@@ -1,34 +1,32 @@
-name: PUB WITH BUN
-run-name: PUB triggered by ${{ github.actor }}
-
+name: Deploy
 on:
   push:
-    branches: [ "master" ]
+    branches: [main]
   pull_request:
-    branches: [ "master" ]
-  workflow_dispatch:
+    branches: [main]
 jobs:
   deploy:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with: 
-          bun-version: "canary"
-      - name: Install Dependencies
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+          
+      - name: Install dependencies
         run: bun i -f
-
-      - name: Run Build Script
+        
+      - name: Build
         run: bun run web:build
         
-      - name: Install SSH Client
+      - name: Install SSH Key
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.bweb_dep_key }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           
       - name: Deploy
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-              scp ./build/* "$SSH_USER@SSH_ADDR:/www/cainb"
-              ssh "$SSH_USER@SSH_ADDR" "systemctl restart web"
+          scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
+          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo -n systemctl restart web"
