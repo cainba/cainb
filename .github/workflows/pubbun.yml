@@ -40,36 +40,11 @@ jobs:
     - name: Build project
       run: |
         bun run web:build
+        scp ./build/* "$SSH_USER@SSH_ADDR" /www/cainb
 
-    - name: Deploy to remote server
-      env:
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_ADDR: ${{ secrets.SSH_ADDR }}
+    - name : Deploy
       run: |
-         ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
-    - name: Setup SSH
-      env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_ADDR: ${{ secrets.SSH_ADDR }}
-      run: |
-          eval "$(ssh-agent -s)"
-          mkdir -p ~/.ssh
-          ssh-agent -s > ~/.ssh/ssh-agent.env
-          . ~/.ssh/ssh-agent.env
-          echo "$SSH_KEY" > /tmp/ssh_key
-          chmod 600 /tmp/ssh_key
-          ssh-add /tmp/ssh_key
-          ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
-          ssh-add -l
-          
-    - name: Deploy to remote server
-      env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_ADDR: ${{ secrets.SSH_ADDR }}
-      run: |
-          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
-            set -x  # Enable command tracing
+            ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
             SERVICE="web"
             if systemctl is-active --quiet "$SERVICE"; then
               echo "Service $SERVICE is running. Stopping it..."
@@ -85,4 +60,4 @@ jobs:
               echo "Failed to restart $SERVICE."
               exit 1
             fi
-          EOF
+            EOF
