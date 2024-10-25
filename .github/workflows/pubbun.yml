@@ -71,7 +71,7 @@ jobs:
           
       - name: Restart Remote 
         run: |
-              ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << EOF
+              ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << 'EOF'
                 SERVICE="web"
                 if systemctl is-active --quiet "$SERVICE"; then
                   echo "Service $SERVICE is running. Stopping it..."
