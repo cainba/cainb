@@ -1,5 +1,5 @@
-name: Publish With Bun
-run-name: PUB triggered by ${{ github.actor }}
+name: PUB WITH BUN
+run-name: PUB triggered by {{ github.actor }}
 
 on:
   push:
@@ -11,12 +11,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
     - uses: oven-sh/setup-bun@v2
       with:
         bun_version: "canary"
-        
     - name: Setup SSH
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -27,9 +27,9 @@ jobs:
         chmod 600 /tmp/ssh_key
         eval "$(ssh-agent -s)"
         ssh-add /tmp/ssh_key
-
         mkdir -p ~/.ssh
         ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
+        ssh-add -l
 
     - name: Install dependencies
       run: |
@@ -44,5 +44,5 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
-        scp -r ./build/* $SSH_USER@$SSH_ADDR:/www/cainb
-
+        # Add IdentitiesOnly=yes to ensure the correct SSH key is used
+        scp -o IdentitiesOnly=yes -r ./build/* $SSH_USER@$SSH_ADDR:/www/cainb
