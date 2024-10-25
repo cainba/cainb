@@ -25,10 +25,12 @@ jobs:
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-          
+                
       - name: Deploy
+        run: |
+          scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "systemctl restart web"
+          shell: /usr/bin/bash -e {0}
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-              scp ./build/* "$SSH_USER@SSH_ADDR:/www/cainb"
-              ssh "$SSH_USER@SSH_ADDR" "systemctl restart web"
+
