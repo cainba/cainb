@@ -8,12 +8,10 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 jobs:
-  
   deploy:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      
+      - uses: actions/checkout@v4   
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
