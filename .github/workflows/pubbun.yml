@@ -54,4 +54,4 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
-         ssh -vvv -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
+         ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
