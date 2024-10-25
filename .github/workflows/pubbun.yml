@@ -40,7 +40,7 @@ jobs:
     - name: Build project
       run: |
         bun run web:build
-        scp ./build/* "$SSH_USER@SSH_ADDR":/www/cainb
+        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ./build/* "$SSH_USER@$SSH_ADDR":/www/cainb
 
     - name : Deploy
       run: |
