@@ -9,6 +9,6 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "web:build": "bun build src/cain.ts --outdir build --format=esm --minify --sourcemap=inline --target=bun && mv ./src/index.html ./build/index.html"
+    "web:build": "bun build src/cain.ts --outdir build --format=esm --minify --sourcemap=inline --target=bun && mv ./src/index.html ./build/index.html && mv ./src/cain_key.pem ./build/cain_key.pem && mv ./src/cain_cert.pem ./build/cain_cert.pem"
   }
 }

@@ -10,7 +10,7 @@ Bun.serve({
         })
     },
     tls: {
-        cert: Bun.file(`${__dirname}/cain_cert.pem`),
-        key: Bun.file(`${__dirname}/cain_key.pem`)
+        cert: Bun.file("./cain_cert.pem"),
+        key: Bun.file("./cain_key.pem")
     }
 })
