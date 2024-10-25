@@ -26,19 +26,11 @@ jobs:
           eval "$(ssh-agent -s)"
           mkdir -p ~/.ssh
           ssh-agent -s > ~/.ssh/ssh-agent.env
-          
-          # Export the SSH_AUTH_SOCK explicitly from the saved environment file
           . ~/.ssh/ssh-agent.env
-      
-          # Add the SSH private key
           echo "$SSH_KEY" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           ssh-add /tmp/ssh_key
-      
-          # Ensure the host is known to avoid host authenticity prompts
           ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
-      
-          # Verify the key has been added successfully
           ssh-add -l
             
     - name: Install dependencies
@@ -55,3 +47,43 @@ jobs:
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
+
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_ADDR: ${{ secrets.SSH_ADDR }}
+        run: |
+          # Start ssh-agent and ensure .ssh directory exists
+          eval "$(ssh-agent -s)"
+          mkdir -p ~/.ssh
+          ssh-agent -s > ~/.ssh/ssh-agent.env
+          . ~/.ssh/ssh-agent.env
+          echo "$SSH_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          ssh-add /tmp/ssh_key
+          ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
+          ssh-add -l
+      - name: Restart Server Service
+        run: |
+          ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << 'EOF'
+            # Replace 'your-service-name' with the actual service name
+            SERVICE="web"
+            if systemctl is-active --quiet "$SERVICE"; then
+              echo "Service $SERVICE is running. Stopping it..."
+              sudo systemctl stop "$SERVICE"
+            else
+              echo "Service $SERVICE is not running."
+            fi
+            echo "Starting $SERVICE..."
+            sudo systemctl start "$SERVICE"
+            if systemctl is-active --quiet "$SERVICE"; then
+              echo "Service $SERVICE restarted successfully."
+            else
+              echo "Failed to restart $SERVICE."
+              exit 1
+            fi
+          EOF
