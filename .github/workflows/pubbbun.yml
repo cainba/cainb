@@ -28,7 +28,7 @@ jobs:
       - name: Install SSH Key
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.bweb_dep_key }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
           
       - name: Add Known Hosts
         run: |
