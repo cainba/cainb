@@ -1,5 +1,5 @@
 name: PUB WITH BUN
-run-name: PUB triggered by {{ github.actor }}
+run-name: PUB triggered by ${{ github.actor }}
 
 on:
   push:
