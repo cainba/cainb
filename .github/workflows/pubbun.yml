@@ -17,6 +17,14 @@ jobs:
     - uses: oven-sh/setup-bun@v2
       with:
         bun-version: "canary"
+    - name: Install dependencies
+      run: |
+        bun install -f
+
+    - name: Build project
+      run: |
+        bun run web:build
+        
     - name: Setup SSH
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -32,19 +40,7 @@ jobs:
           ssh-add /tmp/ssh_key
           ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
           ssh-add -l
-            
-    - name: Install dependencies
-      run: |
-        bun install -f
-
-    - name: Build project
-      run: |
-        bun run web:build
-        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ./build/* "$SSH_USER@$SSH_ADDR":/www/cainb
-
-    - name : Deploy
-      run: |
-            ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
+          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
             SERVICE="web"
             if systemctl is-active --quiet "$SERVICE"; then
               echo "Service $SERVICE is running. Stopping it..."
