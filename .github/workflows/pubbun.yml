@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: oven-sh/setup-bun@v2
       with:
-        bun_version: "canary"
+        bun-version: "canary"
     - name: Setup SSH
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -40,7 +40,7 @@ jobs:
     - name: Build project
       run: |
         bun run web:build
-        scp ./build/* "$SSH_USER@SSH_ADDR" /www/cainb
+        scp ./build/* "$SSH_USER@SSH_ADDR":/www/cainb
 
     - name : Deploy
       run: |
