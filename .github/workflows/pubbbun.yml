@@ -5,14 +5,14 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "canary"
+          bun-version: canary
           
       - name: Install dependencies
         run: bun i -f
@@ -27,5 +27,6 @@ jobs:
           
       - name: Deploy
         run: |
-              scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
-              ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo -n systemctl restart web"
+          # Use the SSH agent instead of a key file
+          scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo -n systemctl restart web"
