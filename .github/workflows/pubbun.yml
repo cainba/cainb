@@ -49,6 +49,7 @@ jobs:
          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
 
   server:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH
@@ -67,8 +68,9 @@ jobs:
           ssh-add /tmp/ssh_key
           ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
           ssh-add -l
-          - name: Restart Remote Service
-            run: |
+          
+      - name: Restart Remote 
+        run: |
               ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << EOF
                 SERVICE="web"
                 if systemctl is-active --quiet "$SERVICE"; then
