@@ -31,16 +31,18 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
+        # Start SSH agent and add key
         eval "$(ssh-agent -s)"
         mkdir -p ~/.ssh
-        ssh-agent -s > ~/.ssh/ssh-agent.env
-        . ~/.ssh/ssh-agent.env
         echo "$SSH_KEY" > /tmp/ssh_key
         chmod 600 /tmp/ssh_key
         ssh-add /tmp/ssh_key
         ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
-        ssh-add -l
-        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -J /www/cainb ./build/* "$SSH_USER@SSH_ADDR"
+    
+        # Transfer build files to the remote directory
+        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ./build/* "$SSH_USER@$SSH_ADDR:/www/cainb"
+    
+        # Restart the service on the remote server
         ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" /bin/bash << 'EOF'
           SERVICE="web"
           if systemctl is-active --quiet "$SERVICE"; then
