@@ -7,44 +7,28 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
-
 jobs:
-  build:
+  deploy:
     runs-on: self-hosted
-
     steps:
-    - uses: actions/checkout@v4
-    - uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: "canary"
-        
-    - name: Install dependencies
-      run: bun install -f
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with: 
+          bun-version: "canary"
+      - name: Install Dependencies
+        run: bun i -f
 
-    - name: Build project
-      run: bun run web:build
-    
-    - name: Deploy
-      env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_ADDR: ${{ secrets.SSH_ADDR }}
-      run: |
-        eval "$(ssh-agent -s)"
-        mkdir -p ~/.ssh
-        echo "$SSH_KEY" > /tmp/ssh_key
-        chmod 600 /tmp/ssh_key
-        ssh-add /tmp/ssh_key
-        ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
-    
-        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ./build/* "$SSH_USER@$SSH_ADDR:/www/cainb"
+      - name: Run Build Script
+        run: bun run web:build
         
-        ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" /bin/bash << 'EOF'
-          SERVICE="web"
-          if systemctl is-active --quiet "$SERVICE"; then
-            sudo systemctl stop "$SERVICE"
-          fi
-          sudo systemctl start "$SERVICE"
-          systemctl is-active --quiet "$SERVICE" || exit 1
-        EOF
-
+      - name: Install SSH Client
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.bweb_dep_key }}
+          
+      - name: Deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+              scp ./build/* "$SSH_USER@SSH_ADDR:/www/cainb"
+              ssh "$SSH_USER@SSH_ADDR" "systemctl restart web"
