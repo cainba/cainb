@@ -70,7 +70,6 @@ jobs:
           - name: Restart Remote Service
             run: |
               ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << EOF
-                # Replace 'your-service-name' with the actual service name
                 SERVICE="web"
                 if systemctl is-active --quiet "$SERVICE"; then
                   echo "Service $SERVICE is running. Stopping it..."
