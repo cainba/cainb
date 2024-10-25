@@ -44,5 +44,4 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
-        # Add IdentitiesOnly=yes to ensure the correct SSH key is used
-        scp -o IdentitiesOnly=yes -r ./build/* $SSH_USER@$SSH_ADDR:/www/cainb
+        ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
