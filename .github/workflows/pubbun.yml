@@ -47,11 +47,6 @@ jobs:
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" "echo 'SSH Connection Successful'"
-
-  server:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
     - name: Setup SSH
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -70,25 +65,24 @@ jobs:
           
     - name: Deploy to remote server
       env:
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_ADDR: ${{ secrets.SSH_ADDR }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
-        ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
-          set -x  # Enable command tracing
-          SERVICE="web"
-          if systemctl is-active --quiet "$SERVICE"; then
-            echo "Service $SERVICE is running. Stopping it..."
-            sudo systemctl stop "$SERVICE"
-          else
-            echo "Service $SERVICE is not running."
-          fi
-          echo "Starting $SERVICE..."
-          sudo systemctl start "$SERVICE"
-          if systemctl is-active --quiet "$SERVICE"; then
-            echo "Service $SERVICE restarted successfully."
-          else
-            echo "Failed to restart $SERVICE."
-            exit 1
-          fi
-        EOF
-
+          ssh -vvv -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" <<EOF
+            set -x  # Enable command tracing
+            SERVICE="web"
+            if systemctl is-active --quiet "$SERVICE"; then
+              echo "Service $SERVICE is running. Stopping it..."
+              sudo systemctl stop "$SERVICE"
+            else
+              echo "Service $SERVICE is not running."
+            fi
+            echo "Starting $SERVICE..."
+            sudo systemctl start "$SERVICE"
+            if systemctl is-active --quiet "$SERVICE"; then
+              echo "Service $SERVICE restarted successfully."
+            else
+              echo "Failed to restart $SERVICE."
+              exit 1
+            fi
+          EOF
