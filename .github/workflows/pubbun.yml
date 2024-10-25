@@ -40,7 +40,7 @@ jobs:
         ssh-add /tmp/ssh_key
         ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
         ssh-add -l
-        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ./build/* "$SSH_USER@SSH_ADDR":/www/cainb
+        scp -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -J /www/cainb ./build/* "$SSH_USER@SSH_ADDR"
         ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" /bin/bash << 'EOF'
           SERVICE="web"
           if systemctl is-active --quiet "$SERVICE"; then
