@@ -9,6 +9,6 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "web:build": "bun build src/cain.ts --outdir build --format=esm --minify --sourcemap=inline --target=bun"
+    "web:build": "bun build src/cain.ts --outdir build --format=esm --minify --sourcemap=inline --target=bun && mv src/index.html build/index.html"
   }
 }
