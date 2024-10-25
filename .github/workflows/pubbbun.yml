@@ -37,8 +37,8 @@ jobs:
           
       - name: Deploy
         run: |
-          scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
-          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "systemctl restart web"
+          scp -i ~/.ssh/deploy_key ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
+          ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo systemctl restart web"
         env:
           SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
 
