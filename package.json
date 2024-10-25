@@ -1,0 +1,14 @@
+{
+  "name": "cainb",
+  "module": "cain.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "web:build": "bun build src/cain.ts --outdir build --format=esm --minify --sourcemap=inline --target=bun --bytecode"
+  }
+}
