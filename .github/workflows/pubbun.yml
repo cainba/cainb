@@ -23,16 +23,15 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
-            echo "$SSH_KEY" > /tmp/ssh_key
-            chmod 600 /tmp/ssh_key
-            eval "$(ssh-agent -s)"
-            export SSH_AUTH_SOCK=$(ssh-agent -s | grep -o '/tmp/ssh-.*/agent.[0-9]+')  # Explicitly set SSH_AUTH_SOCK
-            ssh-add /tmp/ssh_key
-
-            mkdir -p ~/.ssh
-            ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
-
-            ssh-add -l
+          eval "$(ssh-agent -s)"
+          ssh-agent -s > ~/.ssh/ssh-agent.env
+          . ~/.ssh/ssh-agent.env
+          echo "$SSH_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          ssh-add /tmp/ssh_key
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
+          ssh-add -l
             
     - name: Install dependencies
       run: |
