@@ -27,6 +27,5 @@ jobs:
           
       - name: Deploy
         run: |
-          # Use the SSH agent instead of a key file
           scp ./build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}:/www/cainb"
-          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo -n systemctl restart web"
+          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_ADDR }}" "sudo -n systemctl restart web"
