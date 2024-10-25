@@ -69,22 +69,22 @@ jobs:
           ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
           ssh-add -l
           
-           - name: Restart Remote Service
-            run: |
-              ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << EOF
-                SERVICE="web"
-                if systemctl is-active --quiet "\$SERVICE"; then
-                  echo "Service \$SERVICE is running. Stopping it..."
-                  sudo systemctl stop "\$SERVICE"
-                else
-                  echo "Service \$SERVICE is not running."
-                fi
-                echo "Starting \$SERVICE..."
-                sudo systemctl start "\$SERVICE"
-                if systemctl is-active --quiet "\$SERVICE"; then
-                  echo "Service \$SERVICE restarted successfully."
-                else
-                  echo "Failed to restart \$SERVICE."
-                  exit 1
-                fi
-              EOF
+      - name: Restart Remote Service
+        run: |
+          ssh -i /tmp/ssh_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$SSH_USER@$SSH_ADDR" << EOF
+            SERVICE="web"
+            if systemctl is-active --quiet "\$SERVICE"; then
+              echo "Service \$SERVICE is running. Stopping it..."
+              sudo systemctl stop "\$SERVICE"
+            else
+              echo "Service \$SERVICE is not running."
+            fi
+            echo "Starting \$SERVICE..."
+            sudo systemctl start "\$SERVICE"
+            if systemctl is-active --quiet "\$SERVICE"; then
+              echo "Service \$SERVICE restarted successfully."
+            else
+              echo "Failed to restart \$SERVICE."
+              exit 1
+            fi
+          EOF
