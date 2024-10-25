@@ -1,5 +1,5 @@
 name: Publish With Bun
-run-name: PUB triggered by {{ github.actor }}
+run-name: PUB triggered by ${{ github.actor }}
 
 on:
   push:
