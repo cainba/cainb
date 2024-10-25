@@ -24,13 +24,21 @@ jobs:
         SSH_ADDR: ${{ secrets.SSH_ADDR }}
       run: |
           eval "$(ssh-agent -s)"
+          mkdir -p ~/.ssh
           ssh-agent -s > ~/.ssh/ssh-agent.env
+          
+          # Export the SSH_AUTH_SOCK explicitly from the saved environment file
           . ~/.ssh/ssh-agent.env
+      
+          # Add the SSH private key
           echo "$SSH_KEY" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           ssh-add /tmp/ssh_key
-          mkdir -p ~/.ssh
+      
+          # Ensure the host is known to avoid host authenticity prompts
           ssh-keyscan -H "$SSH_ADDR" >> ~/.ssh/known_hosts
+      
+          # Verify the key has been added successfully
           ssh-add -l
             
     - name: Install dependencies
